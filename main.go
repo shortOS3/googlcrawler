@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 )
 
 type Answer struct {
@@ -19,6 +20,7 @@ type Long struct {
 
 func myfunc() []*Answer {
 	var ab = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
+	var wg sync.WaitGroup
 	key := ""
 	addr := "https://www.googleapis.com/urlshortener/v1/url?shortUrl=http://goo.gl/"
 
@@ -29,7 +31,9 @@ func myfunc() []*Answer {
 		for _, d := range ab {
 			id := fmt.Sprintf("aa%s%s", c, d)
 			url := fmt.Sprintf("%s%s&key=%s", addr, id, key)
+			wg.Add(1)
 			go func(url string, id string) {
+				defer wg.Done()
 				l := Long{}
 				resp, err := http.Get(url)
 				result, _ := ioutil.ReadAll(resp.Body)
@@ -41,6 +45,7 @@ func myfunc() []*Answer {
 					ch <- &Answer{id, l.LongUrl, err}
 				}
 			}(url, id)
+			wg.Wait()
 		}
 	}
 	for {
