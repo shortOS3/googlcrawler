@@ -30,7 +30,6 @@ func crawl(half []string, ab []string) {
 						result, _ := ioutil.ReadAll(resp.Body)
 						resp.Body.Close()
 						e := json.Unmarshal(result, &l)
-						wg.Done()
 						if e != nil {
 							fmt.Println("Problem")
 						} else {
@@ -39,6 +38,7 @@ func crawl(half []string, ab []string) {
 					} else {
 						fmt.Println("Error")
 					}
+					wg.Done()
 				}(url)
 			}
 		}
