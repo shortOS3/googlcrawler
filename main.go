@@ -24,7 +24,7 @@ func crawl(half []string, ab []string, a string, key string) {
 			for _, d := range ab {
 				id := fmt.Sprintf("%s%s%s%s", a, b, c, d)
 				url := fmt.Sprintf("%s%s&key=%s", addr, id, key)
-				go func(url string) {
+				go func(url string, id string) {
 					l := Long{}
 					resp, err := http.Get(url)
 					if err == nil {
@@ -34,13 +34,13 @@ func crawl(half []string, ab []string, a string, key string) {
 						if e != nil {
 							fmt.Println("Problem")
 						} else {
-							fmt.Printf("%s\n", l.LongUrl)
+							fmt.Printf("%s -> %s\n", id, l.LongUrl)
 						}
 					} else {
 						fmt.Println("Error")
 					}
 					wg.Done()
-				}(url)
+				}(url, id)
 			}
 		}
 		wg.Wait()
